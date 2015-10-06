@@ -59,11 +59,38 @@ class Transaction
   end
 
   def commit
-    raise 'unimplemented!!!'
+    db_instance = nil
+    if @db_instance.nil? && !@next_transaction.nil?
+      db_instance = @next_transaction.commit
+    else
+      db_instance = @db_instance
+    end
+
+    @set_opt_hash.each do |k, v|
+      db_instance.db_hash[k] = v
+    end
+
+    @delete_keys.each do |k, v|
+      db_instance.db_hash.delete(k)
+    end
+
+    @reverse_hash_shadow.each do |k, v|
+      if !db_instance.reverse_hash.has_key?(k)
+        db_instance.reverse_hash[k] = 0
+      end
+
+      db_instance.reverse_hash[k] += v
+
+      if db_instance.reverse_hash[k] == 0
+        db_instance.reverse_hash.delete(k)
+      end
+    end
+
+    return db_instance
   end
 
   def rollback
-    raise 'unimplemented!!!'
+    return @next_transaction
   end
 
   def change_reverse_hash_shadow(key, value)
