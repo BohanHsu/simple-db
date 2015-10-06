@@ -43,14 +43,14 @@ describe 'Transaction' do
     @transaction2.num_equal_to_operation(20).must_equal(1)
 
     @transaction1.set_operation('eax', 30)
-    @transaction1.reverse_hash_shadow[10].must_equal(-1)
-    @transaction1.reverse_hash_shadow[30].must_equal(1)
+    @transaction1.reverse_hash_mask[10].must_equal(-1)
+    @transaction1.reverse_hash_mask[30].must_equal(1)
     @transaction1.num_equal_to_operation(10).must_equal(1)
     @transaction1.num_equal_to_operation(30).must_equal(1)
 
     @transaction2.set_operation('eax', 40)
-    @transaction2.reverse_hash_shadow[30].must_equal(-1)
-    @transaction2.reverse_hash_shadow[40].must_equal(1)
+    @transaction2.reverse_hash_mask[30].must_equal(-1)
+    @transaction2.reverse_hash_mask[40].must_equal(1)
     @transaction2.num_equal_to_operation(40).must_equal(1)
     @transaction2.num_equal_to_operation(30).must_equal(0)
     @transaction2.num_equal_to_operation(20).must_equal(1)
@@ -59,59 +59,59 @@ describe 'Transaction' do
 
   it 'should unset key value in transaction' do
     @transaction1.unset_operation('eax')
-    @transaction1.reverse_hash_shadow[10] = -1
+    @transaction1.reverse_hash_mask[10] = -1
     @transaction1.num_equal_to_operation(10).must_equal(1)
     @transaction2.unset_operation('ebx')
-    @transaction2.reverse_hash_shadow[10] = -1
+    @transaction2.reverse_hash_mask[10] = -1
     @transaction2.num_equal_to_operation(10).must_equal(0)
   end
 
   it 'should work when unset and set in same transaction' do
     @transaction1.set_operation('eax', 30)
-    @transaction1.reverse_hash_shadow[30].must_equal(1)
+    @transaction1.reverse_hash_mask[30].must_equal(1)
     @transaction1.num_equal_to_operation(30).must_equal(1)
     @transaction1.unset_operation('eax')
     @transaction1.set_opt_hash['eax'].must_equal(nil)
     @transaction1.set_opt_hash['eax'].must_equal(nil)
-    @transaction1.reverse_hash_shadow[30].must_equal(nil)
+    @transaction1.reverse_hash_mask[30].must_equal(nil)
     @transaction1.num_equal_to_operation(30).must_equal(0)
     @transaction1.set_operation('eax', 30)
-    @transaction1.reverse_hash_shadow[30].must_equal(1)
+    @transaction1.reverse_hash_mask[30].must_equal(1)
     @transaction1.num_equal_to_operation(30).must_equal(1)
     @transaction1.delete_keys['eax'].must_equal(nil)
 
     @transaction2.set_operation('ebx', 40)
-    @transaction2.reverse_hash_shadow[40].must_equal(1)
+    @transaction2.reverse_hash_mask[40].must_equal(1)
     @transaction2.num_equal_to_operation(40).must_equal(1)
     @transaction2.unset_operation('ebx')
     @transaction2.set_opt_hash['ebx'].must_equal(nil)
     @transaction2.set_opt_hash['ebx'].must_equal(nil)
-    @transaction2.reverse_hash_shadow[40].must_equal(nil)
+    @transaction2.reverse_hash_mask[40].must_equal(nil)
     @transaction2.num_equal_to_operation(40).must_equal(0)
     @transaction2.set_operation('ebx', 40)
     @transaction2.delete_keys['ebx'].must_equal(nil)
-    @transaction2.reverse_hash_shadow[40].must_equal(1)
+    @transaction2.reverse_hash_mask[40].must_equal(1)
     @transaction2.num_equal_to_operation(40).must_equal(1)
   end
 
   it 'should work when unset and set in different transaction' do
-    @transaction1.reverse_hash_shadow[10].must_equal(nil)
+    @transaction1.reverse_hash_mask[10].must_equal(nil)
     @transaction1.unset_operation('eax')
-    @transaction1.reverse_hash_shadow[10].must_equal(-1)
+    @transaction1.reverse_hash_mask[10].must_equal(-1)
     @transaction1.num_equal_to_operation(10).must_equal(1)
     @transaction1.get_operation('eax').must_equal(nil)
     @transaction2.set_operation('eax', 30)
-    @transaction2.reverse_hash_shadow[10].must_equal(nil)
-    @transaction2.reverse_hash_shadow[30].must_equal(1)
+    @transaction2.reverse_hash_mask[10].must_equal(nil)
+    @transaction2.reverse_hash_mask[30].must_equal(1)
     @transaction2.get_operation('eax').must_equal(30)
 
     @transaction1.set_operation('ebx', 40)
-    @transaction1.reverse_hash_shadow[10].must_equal(-2)
-    @transaction1.reverse_hash_shadow[40].must_equal(1)
+    @transaction1.reverse_hash_mask[10].must_equal(-2)
+    @transaction1.reverse_hash_mask[40].must_equal(1)
     @transaction1.num_equal_to_operation(10).must_equal(0)
     @transaction1.get_operation('ebx').must_equal(40)
     @transaction2.unset_operation('ebx')
-    @transaction2.reverse_hash_shadow[40].must_equal(-1)
+    @transaction2.reverse_hash_mask[40].must_equal(-1)
     @transaction2.num_equal_to_operation(40).must_equal(0)
     @transaction2.get_operation('ebx').must_equal(nil)
   end

@@ -22,7 +22,6 @@ class Interpreter
     when action == 'UNSET'
       key = argv[1]
       result = @database.unset_operation(key)
-      #return result_to_string(result, action)
       return nil
     when action == 'NUMEQUALTO'
       value = argv[1]
@@ -51,7 +50,6 @@ class Interpreter
       else
         return result.to_s
       end
-    #when action == 'UNSET'
     when action == 'NUMEQUALTO'
       return result.to_s
     when action == 'ROLLBACK'

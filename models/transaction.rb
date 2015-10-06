@@ -1,9 +1,10 @@
 class Transaction
-  attr_accessor :set_opt_hash, :delete_keys, :reverse_hash_shadow, :db_instance, :next_transaction
+  attr_accessor :set_opt_hash, :delete_keys, :reverse_hash_mask, :db_instance, :next_transaction
+
   def initialize(db_instance=nil, next_transaction=nil)
     @set_opt_hash = {}
     @delete_keys = {}
-    @reverse_hash_shadow = {}
+    @reverse_hash_mask = {}
     @db_instance = db_instance
     @next_transaction = next_transaction
   end
@@ -11,13 +12,13 @@ class Transaction
   def set_operation(key, value)
     old_value = get_operation(key)
     if old_value.nil?
-      change_reverse_hash_shadow(value, 1)
+      change_reverse_hash_mask(value, 1)
       if @delete_keys.has_key?(key)
         @delete_keys.delete(key)
       end
     else
-      change_reverse_hash_shadow(old_value, -1)
-      change_reverse_hash_shadow(value, 1)
+      change_reverse_hash_mask(old_value, -1)
+      change_reverse_hash_mask(value, 1)
     end
     @set_opt_hash[key] = value
   end
@@ -45,16 +46,16 @@ class Transaction
     end
 
     if !old_value.nil?
-      change_reverse_hash_shadow(old_value, -1)
+      change_reverse_hash_mask(old_value, -1)
     end
     @delete_keys[key] = true
   end
 
   def num_equal_to_operation(value)
     if @db_instance.nil? && !@next_transaction.nil?
-      return (@reverse_hash_shadow[value] || 0) + (@next_transaction.num_equal_to_operation(value))
+      return (@reverse_hash_mask[value] || 0) + (@next_transaction.num_equal_to_operation(value))
     else
-      return (@reverse_hash_shadow[value] || 0) + (@db_instance.num_equal_to_operation(value) || 0)
+      return (@reverse_hash_mask[value] || 0) + (@db_instance.num_equal_to_operation(value) || 0)
     end
   end
 
@@ -74,7 +75,7 @@ class Transaction
       db_instance.db_hash.delete(k)
     end
 
-    @reverse_hash_shadow.each do |k, v|
+    @reverse_hash_mask.each do |k, v|
       if !db_instance.reverse_hash.has_key?(k)
         db_instance.reverse_hash[k] = 0
       end
@@ -93,15 +94,15 @@ class Transaction
     return @next_transaction
   end
 
-  def change_reverse_hash_shadow(key, value)
-    if !@reverse_hash_shadow.has_key?(key)
-      @reverse_hash_shadow[key] = 0
+  def change_reverse_hash_mask(key, value)
+    if !@reverse_hash_mask.has_key?(key)
+      @reverse_hash_mask[key] = 0
     end
 
-    @reverse_hash_shadow[key] += value
+    @reverse_hash_mask[key] += value
 
-    if @reverse_hash_shadow[key] == 0
-      @reverse_hash_shadow.delete(key)
+    if @reverse_hash_mask[key] == 0
+      @reverse_hash_mask.delete(key)
     end
   end
 end

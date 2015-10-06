@@ -2,7 +2,6 @@ def cmdline(interpreter)
   shutdown = false
   while !shutdown do
     command = gets
-    #p input
     if command.upcase =~ /END/
       shutdown = true
     else
