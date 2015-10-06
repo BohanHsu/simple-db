@@ -1,30 +1,24 @@
-#require 'rbtree'
-require 'set'
-
 class DataBaseInstance
   attr_accessor :db_hash, :reverse_hash
 
-  def initialze
+  def initialize
     @db_hash = {}
     @reverse_hash = {}
   end
 
   def set_operation(key, value)
-    #raise 'err: key #{key} is NULL' if key.nil?
-
-    # remove from reverse_hash
     if @db_hash.has_key?(key)
       old_value = @db_hash[key]
-      @reverse_hash[old_value].delete(key)
+      @reverse_hash[old_value] -= 1
     end
 
     @db_hash[key] = value
 
     if !@reverse_hash.has_key?(value)
-      @reverse_hash[value] = Set.new
+      @reverse_hash[value] = 0
     end
 
-    @reverse_hash[value] << key
+    @reverse_hash[value] += 1
   end
 
   def get_operation(key)
@@ -36,9 +30,8 @@ class DataBaseInstance
       old_value = @db_hash[key]
 
       @db_hash.delete(key)
-      key_set = @reverse_hash[old_value]
-      key_set.delete(key)
-      if key_set.empty?
+      @reverse_hash[old_value] -= 1
+      if @reverse_hash[old_value] == 0
         @reverse_hash.delete(old_value)
       end
     end
@@ -46,7 +39,7 @@ class DataBaseInstance
 
   def num_equal_to_operation(value)
     if @reverse_hash.has_key?(value)
-      return @reverse_hash[value].size
+      return @reverse_hash[value]
     end
     0
   end
