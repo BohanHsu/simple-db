@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require '../models/db_instance'
+require './models/db_instance'
 
 describe 'DataBaseInstance' do
   before do

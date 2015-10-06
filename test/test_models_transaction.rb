@@ -1,6 +1,6 @@
 require 'minitest/autorun'
-require '../models/db_instance'
-require '../models/transaction'
+require './models/db_instance'
+require './models/transaction'
 
 describe 'Transaction' do
   before do
