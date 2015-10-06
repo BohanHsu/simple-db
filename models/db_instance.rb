@@ -6,10 +6,20 @@ class DataBaseInstance
     @reverse_hash = {}
   end
 
+  def clone
+    new_db_instance = DataBaseInstance.new
+    new_db_instance.db_hash = @db_hash.clone
+    new_db_instance.reverse_hash = @reverse_hash.clone
+    new_db_instance
+  end
+
   def set_operation(key, value)
     if @db_hash.has_key?(key)
       old_value = @db_hash[key]
       @reverse_hash[old_value] -= 1
+      if @reverse_hash[old_value] == 0
+        @reverse_hash.delete(old_value)
+      end
     end
 
     @db_hash[key] = value

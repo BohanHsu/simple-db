@@ -12,6 +12,12 @@ describe 'DataBaseInstance' do
     @db_instance.db_hash['ex'].must_equal(10)
     @db_instance.reverse_hash.size.must_equal(1)
     @db_instance.reverse_hash[10].must_equal(1)
+
+    @db_instance.set_operation('ex', 20)
+    @db_instance.db_hash.size.must_equal(1)
+    @db_instance.db_hash['ex'].must_equal(20)
+    @db_instance.reverse_hash.size.must_equal(1)
+    @db_instance.reverse_hash[20].must_equal(1)
   end
 
   it 'should get value by key' do
@@ -44,5 +50,25 @@ describe 'DataBaseInstance' do
     @db_instance.reverse_hash[10].must_equal(2)
     @db_instance.set_operation('eax', 10)
     @db_instance.reverse_hash[10].must_equal(3)
+  end
+
+  it 'should clone db instance with all values' do
+    @db_instance.set_operation('ex', 10)
+    @new_db_instance = @db_instance.clone
+    @new_db_instance.db_hash.size.must_equal(1)
+    @new_db_instance.db_hash['ex'].must_equal(10)
+    @new_db_instance.reverse_hash.size.must_equal(1)
+    @new_db_instance.reverse_hash[10].must_equal(1)
+    @new_db_instance.set_operation('ex', 20)
+
+    @db_instance.db_hash.size.must_equal(1)
+    @db_instance.db_hash['ex'].must_equal(10)
+    @db_instance.reverse_hash.size.must_equal(1)
+    @db_instance.reverse_hash[10].must_equal(1)
+
+    @new_db_instance.db_hash.size.must_equal(1)
+    @new_db_instance.db_hash['ex'].must_equal(20)
+    @new_db_instance.reverse_hash.size.must_equal(1)
+    @new_db_instance.reverse_hash[20].must_equal(1)
   end
 end
